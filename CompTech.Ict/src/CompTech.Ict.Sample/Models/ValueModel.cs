@@ -1,3 +1,6 @@
+using Newtonsoft.Json;
+using System.Collections.Generic;
+
 namespace CompTech.Ict.Sample.Models
 {
     public class ValueModel
