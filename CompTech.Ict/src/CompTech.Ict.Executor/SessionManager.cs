@@ -17,9 +17,9 @@ namespace CompTech.Ict.Sample
     }
     public class Session
     {
-        public Dictionary<Guid, Operation> FinishedCommands() //available operation
+        public List<int> FinishedCommands() //available operation id session and 
         {
-            return new Dictionary<Guid, Operation>();
+            return new List<int>();
         }
         public Dictionary<string, string> mnemonicsValue { get; set; }//<Name, Value> of variable
     };
@@ -30,67 +30,77 @@ namespace CompTech.Ict.Sample
         public string[] inputs { get; set; }
         public string[] outputs { get; set; }
     }
-    
+    public class Executer
+    {
+
+    }
     public class SessionManager
     {
         private int countSession = 0;
         private Dictionary<Guid, Session> sessionDictionary;
         private Dictionary<Guid, SessionStatusEnum> sessionStatus;
-        private List<KeyValuePair<string, string[]>> availableOperations;
+        //private List<KeyValuePair<string, string[]>> availableOperations;
 
-        private object lockListSession = new object();
+        private object lockListSession = new object();        
 
-
-
-        public Session WorkingSession()
-        {
-            Guid id = sessionStatus.First(x => (x.Value == SessionStatusEnum.Awaits || x.Value == SessionStatusEnum.Running)).Key;
-            Session session = sessionDictionary.First(x => x.Key == id).Value;
-            
-            return session;
-        }
 
         public SessionManager()
         {
             sessionDictionary = new Dictionary<Guid, Session>();
             sessionStatus = new Dictionary<Guid, SessionStatusEnum>();
+            //availableOperations = new List<KeyValuePair<string, string[]>>();
         }
-
+        /*
+         получили от Session граф с зависимостями, таблицей значений.
+         дали ей некоторый id, добавили в список сессий и в таблицу со статусом
+         получили доступные операции
+         отправили на выполнение
+         вернули пользователю id сессии
+         */
         public Guid StartSession(/*ComputationGraph*/)
         {
             Guid idSession = Guid.NewGuid();
+            Session session;
             lock (lockListSession)
             {
-                sessionDictionary.TryAdd(idSession, new Session(/*graph*/));
+                session = new Session(/*ComputatingGraph*/);
+                sessionDictionary.TryAdd(idSession, session);
                 sessionStatus.Add(idSession, SessionStatusEnum.Awaits);
             }
-            Session session = sessionDictionary.Last().Value;
+            SendOperation(idSession, session.FinishedCommands());//get available operation from session
 
-            Dictionary<Guid, Operation> tmp = session.FinishedCommands();//get available operation from session
-            foreach (var each in tmp)
-            {
-                string nameOperation = each.Value.name;
-                List<string> inputsValue = new List<string>();
-                foreach (string inputs in each.Value.inputs)
-                {
-                    string value;
-                    if (session.mnemonicsValue.TryGetValue(inputs, out value))
-                    {
-                        inputsValue.Add(value);
-                    }
-                }
-                string[] inputsOperation = inputsValue.ToArray();
-                availableOperations.Add(new KeyValuePair<string, string[]>(nameOperation, inputsOperation));
-            }//formed a list of available operation to execute
-
-
-            //get available oper
-            //execute oper with callback
             return idSession;
         }
 
-        public void SendOperation() { }
+        public void SendOperation(Guid idSession, List<int> availableSessionOperation)
+        {
+            //execute oper with callback
 
+            //найти сессию по ее id
+            sessionDictionary.TryGetValue(idSession, out Session session);
+            /*
+             вытащить отдельно Operation и MnemonicsTable из данной сессии.
+
+             Operation operationSession = session.ComputationGraph.operatio;
+             MnemonicsTable mnemonicsTableSession = session.ComputationGraph.MnemonicsTable;
+
+             найти в операциях сессии каждую доступную операцию
+             List<Operation> availableOperationList = new List<Operation>();
+             foreach(int each in availableSessionOperation)
+             {
+                 availableOperationList.Add(x => x.id==each);
+             }
+             в каждой операции есть массив строк = входам*/
+            //List<KeyValuePair<string, string[]>> operationToExecute = new List<KeyValuePair<string, string[]>>();
+            /*foreach(var each in availableOperationList)
+            {
+               List<string> valueInputs = new List<string>();
+               найти в таблице MnemonicValues соответствие переменная - ее значение
+
+            }
+             */
+            //formed a list of available operation to execute
+        }
         public void StopSession(Guid id)
         {
             lock (lockListSession)
@@ -103,8 +113,8 @@ namespace CompTech.Ict.Sample
                 }
             }
         }
-        
-        
+
+
     }
-    
+
 }
