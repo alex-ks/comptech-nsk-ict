@@ -78,7 +78,8 @@ namespace CompTech.Ict.Sample.Controllers
             
             _context.Remove(entity);
             _context.SaveChanges();
-            return Ok();
+			return Ok();
+			
         }
     }
 }
