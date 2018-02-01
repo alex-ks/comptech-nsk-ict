@@ -6,7 +6,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{751DA0AE-641
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CompTech.Ict.Sample", "src\CompTech.Ict.Sample\CompTech.Ict.Sample.csproj", "{90EEE83F-F041-455C-A214-EE7ABC9E1364}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CompTech.Ict.Executor", "src\CompTech.Ict.Executor\CompTech.Ict.Executor.csproj", "{727417C7-2100-41DF-A098-C8CFAA51A822}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CompTech.Ict.Executor", "src\CompTech.Ict.Executor\CompTech.Ict.Executor.csproj", "{727417C7-2100-41DF-A098-C8CFAA51A822}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -48,6 +48,7 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{90EEE83F-F041-455C-A214-EE7ABC9E1364} = {751DA0AE-6417-45DA-ADD2-3D24ED734101}
+		{727417C7-2100-41DF-A098-C8CFAA51A822} = {751DA0AE-6417-45DA-ADD2-3D24ED734101}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {30DF1149-283F-475F-8B90-881C7EDB9D8F}

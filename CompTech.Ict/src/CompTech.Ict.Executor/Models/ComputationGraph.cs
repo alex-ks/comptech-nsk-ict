@@ -12,7 +12,7 @@ namespace CompTech.Ict.Executor.Models
     public class Comp_Graph
     {
         [JsonProperty("depend")]
-        public int[,] Dependecies { get; set; }
+        public int[][] Dependecies { get; set; }
         [JsonProperty("operations")]
         public List<Operation> Operations { get; set; }
         [JsonProperty("mnemonics_values")]
