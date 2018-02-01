@@ -19,36 +19,34 @@ namespace CompTech.Ict.Sample
 
     public class Executor
     {
-        public ExecutorStatus Status { get; private set; } = ExecutorStatus.Idle;
+        
         private class InputParameters
         {
-            public byte[] ScriptSource { get; set; }
+            public string ScriptSource { get; set; }
             public string[] Parameters { get; set; }
             public Action<string[]> CallBack { get; set; }
         }
+
+        public ExecutorStatus Status { get; private set; } = ExecutorStatus.Idle;
         private Semaphore semaphore;
-        BufferBlock<InputParameters> queue = new BufferBlock<InputParameters>();
-        private string ArgumentsToFiles(string[] arguments, byte[] scriptSource, string id)
+        private BufferBlock<InputParameters> queue = new BufferBlock<InputParameters>();
+
+        private string ArgumentsToFiles(string[] arguments, string scriptSource, string id)
         {
-            string pathTemp = Path.GetTempPath() + id;
+            string pathTemp = Path.Combine(Path.GetTempPath(), id);
             Directory.CreateDirectory(pathTemp); // индивидуальная папка
             int count = arguments.Length;
             for (int i = 0; i < count; i++)
             {
-                string pathToArgument = pathTemp + "\\" + i.ToString() + "input.txt";
-                byte[] array = System.Text.Encoding.Default.GetBytes(arguments[i]);
-                using (FileStream fs = new FileStream(pathToArgument, FileMode.Create))
-                    fs.Write(array, 0, array.Length);
+                string pathToArgument = Path.Combine(pathTemp, $"{i}input.txt");
+                File.WriteAllText(pathToArgument, arguments[i]);
             }
-            using (FileStream fs = new FileStream(pathTemp + "\\" + "source.py", FileMode.Create))
-                fs.Write(scriptSource, 0, scriptSource.Length);
-
+            File.WriteAllText(Path.Combine(pathTemp, "source.py"), scriptSource);
             return pathTemp;
         }
 
         private string[] FilesToArguments(string path)
         {
-
             string[] files = Directory.GetFiles(path, "*output.txt");
             string[] result = new string[files.Length];
             for (int i = 0; i < files.Length; i++)
@@ -62,18 +60,17 @@ namespace CompTech.Ict.Sample
                     // декодируем байты в строку
                     result[i] = System.Text.Encoding.Default.GetString(array);
                 }
-
             }
             return result;
-
         }
+
         public Executor(int n)
         {
             semaphore = new Semaphore(n, n);
             Status = ExecutorStatus.Idle;
         }
 
-        public void Add(byte[] name, string[] parameters, Action<string[]> callBack) // по одному
+        public void Add(string name, string[] parameters, Action<string[]> callBack) // по одному
         {
             queue.Post(new InputParameters()
             {
@@ -87,33 +84,27 @@ namespace CompTech.Ict.Sample
         {
             Status = ExecutorStatus.Running;
 
-            while (true)
+            while (await queue.OutputAvailableAsync())
             {
+                InputParameters tmp = queue.Receive();
 
-                while (await queue.OutputAvailableAsync())
+                semaphore.WaitOne();
+
+                Action taskingOperation = () =>
                 {
-                    InputParameters tmp = queue.Receive();
                     string id = Guid.NewGuid().ToString();
-                    semaphore.WaitOne();
-
-                    Action taskingOperation = () =>
-                    {
-                        var path = ArgumentsToFiles(tmp.Parameters, tmp.ScriptSource, id);
-                        OperationRun(path, tmp.CallBack);
-                        string[] result = FilesToArguments(path);
-                        tmp.CallBack(result);
-                        Directory.Delete(path, true);
-                        semaphore.Release();
-                    };
+                    var path = ArgumentsToFiles(tmp.Parameters, tmp.ScriptSource, id);
+                    OperationRun(path, tmp.CallBack);
+                    string[] result = FilesToArguments(path);
+                    Console.WriteLine(result[0]);
+                    tmp.CallBack?.Invoke(result);
+                    Directory.Delete(path, true);
+                    semaphore.Release();
+                };
 #pragma warning disable CS4014 // Так как этот вызов не ожидается, выполнение существующего метода продолжается до завершения вызова
-                    Task.Run(taskingOperation);
+                Task.Run(taskingOperation);
 #pragma warning restore CS4014 // Так как этот вызов не ожидается, выполнение существующего метода продолжается до завершения вызова
-                }
-
-
             }
-
-
         }
 
         private void OperationRun(string inputPath, Action<string[]> callBack)
@@ -134,7 +125,6 @@ namespace CompTech.Ict.Sample
                 callBack(null);
             }
         }
-
     }
 }
 
