@@ -50,17 +50,7 @@ namespace CompTech.Ict.Sample
             string[] files = Directory.GetFiles(path, "*output.txt");
             string[] result = new string[files.Length];
             for (int i = 0; i < files.Length; i++)
-            {
-                using (FileStream fs = File.OpenRead(files[i]))
-                {
-                    // преобразуем строку в байты
-                    byte[] array = new byte[fs.Length];
-                    // считываем данные
-                    fs.Read(array, 0, array.Length);
-                    // декодируем байты в строку
-                    result[i] = System.Text.Encoding.Default.GetString(array);
-                }
-            }
+                result[i] = File.ReadAllText(files[i]);
             return result;
         }
 
