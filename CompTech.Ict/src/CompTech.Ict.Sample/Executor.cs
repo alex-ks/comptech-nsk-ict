@@ -67,7 +67,7 @@ namespace example
             });
         }
 
-        public async void Loop()
+        private async void Loop()
         {
             Status = ExecutorStatus.Running;
 
@@ -113,11 +113,14 @@ namespace example
                 process = Process.Start(start);
                 process.WaitForExit();
                 if (process.ExitCode != 0)
+                {
+                    Console.Error.WriteLine("Ошибка в исполнении скрипта: {0}", process.ExitCode);
                     callBack(null);
+                }
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Console.Error.WriteLine(ex.Message);
                 callBack(null);
             }
         }
