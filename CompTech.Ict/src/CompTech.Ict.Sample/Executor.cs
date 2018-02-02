@@ -39,19 +39,16 @@ namespace example
                 File.WriteAllText(pathToArgument, arguments[i]);
             }
             File.WriteAllText(Path.Combine(pathTemp, "source.py"), scriptSource);
-
             return pathTemp;
         }
 
         private string[] FilesToOutputs(string path)
         {
-
             string[] files = Directory.GetFiles(path, "*output.txt");
             string[] result = new string[files.Length];
             for (int i = 0; i < files.Length; i++)
                 result[i] = File.ReadAllText(files[i]);
             return result;
-
         }
         public Executor(int n)
         {
@@ -123,7 +120,6 @@ namespace example
                 Console.WriteLine(ex.Message);
                 callBack(null);
             }
-
         }
     }
 }
