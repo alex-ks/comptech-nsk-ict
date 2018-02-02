@@ -8,6 +8,4 @@ namespace CompTech.Ict.Sample.Models
         public int Id { get; set; }
         public string Value { get; set; }
     }
-	[JsonObject]
-	
 }
