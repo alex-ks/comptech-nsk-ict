@@ -30,13 +30,6 @@ namespace CompTech.Ict.Executor
         }
         
     }
-    public class Executor
-    {
-        public void Execute(string name, string[] inputs, Action<string[]> callback)
-        {
-
-        }
-    }
     public class OperationStatus
     {
         public int idOperation { get; set; }
@@ -157,7 +150,7 @@ namespace CompTech.Ict.Executor
                 }
                 operationStatusDictionary[idSession].operationStatus[operation.Id].status = StatusEnum.Running;
                 Action<string[]> callback = GetCallBack(idSession, operation.Id);
-                executor.Execute(operation.Name, inputsValues.ToArray(), callback);
+                executor.Add(operation.Name, inputsValues.ToArray(), callback);
             }
         }
         public void StopSession(Guid id)
