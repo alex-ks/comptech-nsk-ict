@@ -5,11 +5,8 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 
 namespace CompTech.Ict.Executor.Models
-{
-    //public class ComputationGraph
-    //{
-    //List<int> Finished_command;
-    public class Comp_Graph
+{    
+    public class ComputationGraph
     {
         [JsonProperty("depend")]
         public int[][] Dependecies { get; set; }
