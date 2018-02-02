@@ -9,6 +9,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
+using Microsoft.AspNetCore.Mvc;
+using CompTech.Ict.Sample.Models;
 
 namespace CompTech.Ict.Sample
 {
@@ -24,6 +27,7 @@ namespace CompTech.Ict.Sample
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton<SessionManager>();
             services.AddTransient<ApplicationContext>();
             services.AddMvc();
         }
