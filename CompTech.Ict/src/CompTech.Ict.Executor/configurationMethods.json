@@ -1,5 +1,8 @@
 ﻿{
   "numberFile": "Methods/NumberFromFile.py",
+  "Mean": "Methods/Mean.py",
+  "Std": "Methods/Std.py",
+  "Normal": "Methods/NumberFromFile.py",
   "+": "Methods/Addition.py",
   "-": "Methods/Subtraction.py",
   "*": "Methods/Multiplication.py",
