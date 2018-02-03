@@ -18,7 +18,7 @@ namespace CompTech.Ict.Executor.Controllers
             _manager = manager;
         }
         
-        // GET api/values/5
+        // GET api/session/5
         [HttpGet("{id}")]
         public IActionResult Get(Guid id)
         {            
@@ -26,17 +26,17 @@ namespace CompTech.Ict.Executor.Controllers
             return Ok(session);
         }
 
-        // POST api/values
+        // POST api/session
         [HttpPost]
         public IActionResult Post([FromBody]ComputationGraph graph)
         {
             var s = _manager.StartSession(graph);
             //validation 
 
-            return Ok(graph);
+            return Ok(s);
         }
 
-        // DELETE api/values/5
+        // DELETE api/session/{id}
         [HttpDelete("{id}")]
         public IActionResult Delete(Guid id)
         {
