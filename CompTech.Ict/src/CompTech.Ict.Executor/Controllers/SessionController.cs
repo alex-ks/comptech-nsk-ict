@@ -29,7 +29,7 @@ namespace CompTech.Ict.Executor.Controllers
 
         // POST api/values
         [HttpPost]
-        public IActionResult Post([FromBody]Comp_Graph graph)
+        public IActionResult Post([FromBody]ComputationGraph graph)
         {
             var s = _manager.StartSession(graph);
             //validation 

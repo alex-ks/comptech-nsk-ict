@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 
 namespace CompTech.Ict.Executor.Models
 {
-	public class Comp_Graph
+	public class ComputationGraph
 	{
 		[JsonProperty("dependencies")]
 		public int[][] Dependecies { get; set; }

@@ -9,57 +9,24 @@ using System.IO;
 
 namespace CompTech.Ict.Executor
 {
-    public enum StatusEnum
-    {
-        Awaits,
-        Running,
-        Completed,
-        Aborted,
-        Failed
-    }    
-    
-    public class OperationStatus
-    {
-        public int idOperation { get; set; }
-        public StatusEnum status { get; set; }
-        public string[] result { get; set; }
-        public OperationStatus(int id, StatusEnum st, string[] res = null)
-        {
-            idOperation = id;
-            status = st;
-            result = res;
-        }
-    }
-
-    public class SessionStatus
-    {
-        public List<OperationStatus> operationStatus { get; set; }
-        public Dictionary<string, MnemonicsValue> mnemonicsTable { get; set; }
-        public SessionStatus(List<OperationStatus> opStatus, Dictionary<string, MnemonicsValue> value)
-        {
-            operationStatus = opStatus;
-            mnemonicsTable = value;
-        }
-    }
-
     public class SessionManager
     {
-        private Dictionary<Guid, Comp_Graph> sessionDictionary;
+        private Dictionary<Guid, ComputationGraph> sessionDictionary;
         private Dictionary<Guid, SessionStatus> sessionStatus;
         private object lockListSession = new object();
 
         private Action<string[]> GetCallBack (Guid idSession, int idOperation)
         {
-            return (string[] outputs) => Notify(idSession, idOperation, outputs);
+            return outputs => Notify(idSession, idOperation, outputs);
         }
 
         public SessionManager()
         {
-            sessionDictionary = new Dictionary<Guid, Comp_Graph>();
+            sessionDictionary = new Dictionary<Guid, ComputationGraph>();
             sessionStatus = new Dictionary<Guid, SessionStatus>();
         }
 
-        public Guid StartSession(Comp_Graph session)
+        public Guid StartSession(ComputationGraph session)
         {
             Guid idSession = Guid.NewGuid();
             lock (lockListSession)
@@ -86,7 +53,7 @@ namespace CompTech.Ict.Executor
             if (outputs != null)
             {
                 SessionUtilities.OperationCompleted(operationSt, outputs);
-                Comp_Graph session = sessionDictionary[idSession];
+                ComputationGraph session = sessionDictionary[idSession];
                 SessionUtilities.UpdateMnemonicValues(session.MnemonicsValues,
                                                         session.Operations[idOperation].Output,
                                                         outputs);
@@ -115,9 +82,9 @@ namespace CompTech.Ict.Executor
 
         public void OperationsToExecute(Guid idSession, List<int> idAvailableOperation)
         {
-            Comp_Graph session = sessionDictionary[idSession];
-            List<Operation> operationSession = session.Operations;
-            Dictionary<string, MnemonicsValue> mnemonicsTableSession = session.MnemonicsValues;
+            var session = sessionDictionary[idSession];
+            var operationSession = session.Operations;
+            var mnemonicsTableSession = session.MnemonicsValues;
 
             foreach (Operation operation in GetAvailable(operationSession, idAvailableOperation))
             {
@@ -143,21 +110,19 @@ namespace CompTech.Ict.Executor
 
         public List<Operation> GetAvailable(List<Operation> allOperation, List<int> IdAvailable)
         {
-            List<Operation> availableOperation = new List<Operation>();
-            foreach (int index in IdAvailable)
-            {
-                availableOperation.Add(allOperation.Find(x => x.Id == index));
-            }
-            return availableOperation;
+            var availableOperation = IdAvailable.Select(id => allOperation.Find(x => x.Id == id));
+            
+            return availableOperation.ToList();
         }
 
         public void StopSession(Guid id)
         {
-            Comp_Graph session = sessionDictionary[id];
+            ComputationGraph session = sessionDictionary[id];
             SessionStatus status = sessionStatus[id];
 
             if (SessionUtilities.SessionCompleted(status.operationStatus))
             {
+                return;
                 //сессия закончена - всё ОК
             }
             else

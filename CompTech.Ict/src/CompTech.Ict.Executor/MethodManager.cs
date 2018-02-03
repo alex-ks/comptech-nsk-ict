@@ -20,7 +20,7 @@ namespace CompTech.Ict.Executor
 
             Configuration = ConfigurationMethods.Build();
 
-            return $@"{Configuration[nameOfMethod]}";
+            return Configuration[nameOfMethod].ToString();
         }
     }
 }
