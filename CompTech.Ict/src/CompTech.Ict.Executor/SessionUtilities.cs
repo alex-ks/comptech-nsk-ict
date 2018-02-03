@@ -14,7 +14,8 @@ namespace CompTech.Ict.Executor
             int index = 0;
             foreach (string each in operationOut)
             {
-                values[each].Value = newOut[index];
+
+                values.Add(each, new MnemonicsValue { Value = newOut[index], Type = null});
                 index++;
             }
         }
@@ -43,7 +44,7 @@ namespace CompTech.Ict.Executor
 
         public static void OperationFaild(OperationStatus operation)
         {
-            operation.status = StatusEnum.Completed;
+            operation.status = StatusEnum.Failed;
             operation.result = null;
         }
 
@@ -61,6 +62,7 @@ namespace CompTech.Ict.Executor
                     }                    
                 }
             }
+
             return availableOperation;
         }
     }

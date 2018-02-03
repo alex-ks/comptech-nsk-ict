@@ -2,20 +2,20 @@
 using System.Collections.Generic;
 using System.Text;
 using Xunit;
-using example;
 using System.IO;
 using System.Threading;
 using System.Linq;
+using CompTech.Ict.Executor;
 
 namespace CompTech.Ict.ExecutorTest
 {
     public class ExecutorTest
     {
         string script = File.ReadAllText(@"C:\Users\Admin\Source\Repos\Winter School\CompTech.Ict\src\CompTech.Ict.Sample\first.py");
-        private Executor _executor;
+        private Executor.Executor _executor;
         public ExecutorTest()
         {
-            _executor = new Executor(4);
+            _executor = new Executor.Executor(4);
         }
 
         [Fact]

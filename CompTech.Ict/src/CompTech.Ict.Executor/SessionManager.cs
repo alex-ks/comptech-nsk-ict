@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using CompTech.Ict.Executor.Models;
 using Newtonsoft.Json;
 using System.IO;
+using Microsoft.Extensions.Logging;
+
 
 
 namespace CompTech.Ict.Executor
@@ -14,16 +16,19 @@ namespace CompTech.Ict.Executor
         private Dictionary<Guid, ComputationGraph> sessionDictionary;
         private Dictionary<Guid, SessionStatus> sessionStatus;
         private object lockListSession = new object();
+        private readonly ILogger _logger;
 
         private Action<string[]> GetCallBack (Guid idSession, int idOperation)
         {
             return outputs => Notify(idSession, idOperation, outputs);
         }
 
-        public SessionManager()
+        public SessionManager(ILogger<SessionManager> logger) 
         {
             sessionDictionary = new Dictionary<Guid, ComputationGraph>();
             sessionStatus = new Dictionary<Guid, SessionStatus>();
+            _logger = logger;
+            _logger.LogInformation("Session manager a created!");
         }
 
         public Guid StartSession(ComputationGraph session)
@@ -33,6 +38,7 @@ namespace CompTech.Ict.Executor
             {
                 sessionDictionary.Add(idSession, session);
             }
+            _logger.LogInformation($"Create session with id: {idSession}");
             List<OperationStatus> opStatus = new List<OperationStatus>();
             foreach (Operation operation in session.Operations)
             {
@@ -42,9 +48,38 @@ namespace CompTech.Ict.Executor
             {
                 sessionStatus.Add(idSession, new SessionStatus(opStatus, session.MnemonicsValues));
             }
-            List<int> idAvailableOperation = SessionUtilities.GetIDAvailableOperation(sessionStatus[idSession].operationStatus, sessionDictionary[idSession].Dependecies);
+
+            GetLogSession(idSession);
+
+            List<int> idAvailableOperation = SessionUtilities.GetIDAvailableOperation(
+                                                        sessionStatus[idSession].operationStatus,
+                                                        sessionDictionary[idSession].Dependecies);
+            _logger.LogInformation($"ID available operation for session - {idSession}" +
+                                    $" - is is: {string.Join(',',idAvailableOperation.ToArray())}");
             OperationsToExecute(idSession, idAvailableOperation);
+            
             return idSession;
+        }
+
+        private void GetLogSession(Guid idSession)
+        {
+            string str = $"\r\nSession {idSession}:\r\n";
+            foreach(OperationStatus each in sessionStatus[idSession].operationStatus)
+            {
+                str += $"Operation : {each.idOperation}, status: {each.status}\r\n";
+            }
+            _logger.LogInformation(str);
+        }
+
+        private void GetLogVariable(Guid idSession)
+        {
+            var table = sessionStatus[idSession].mnemonicsTable;
+            string tmp = $"\r\nSession {idSession}:\r\n";
+            foreach(var each in table)
+            {
+                tmp += $"var: {each.Key}, val: {each.Value.Value}\r\n";
+            }
+            _logger.LogInformation(tmp);
         }
 
         public void Notify(Guid idSession, int idOperation, string[] outputs)
@@ -53,19 +88,19 @@ namespace CompTech.Ict.Executor
             if (outputs != null)
             {
                 SessionUtilities.OperationCompleted(operationSt, outputs);
-                ComputationGraph session = sessionDictionary[idSession];
-                SessionUtilities.UpdateMnemonicValues(session.MnemonicsValues,
-                                                        session.Operations[idOperation].Output,
-                                                        outputs);
+                ComputationGraph session = sessionDictionary[idSession];                
                 SessionUtilities.UpdateMnemonicValues(sessionStatus[idSession].mnemonicsTable,
                                                         session.Operations[idOperation].Output,
                                                         outputs);
+                GetLogSession(idSession);
 
                 if (!SessionUtilities.SessionCompleted(sessionStatus[idSession].operationStatus))
                 {
                     List<int> idAvailableOperation = SessionUtilities.GetIDAvailableOperation(
                                                                     sessionStatus[idSession].operationStatus,
                                                                     sessionDictionary[idSession].Dependecies);
+                    _logger.LogInformation($"ID available operation for session - {idSession} " +
+                                            $"- is: {string.Join(',', idAvailableOperation.ToArray())}");
                     OperationsToExecute(idSession, idAvailableOperation);
                 }
                 else
@@ -94,7 +129,7 @@ namespace CompTech.Ict.Executor
                 string path = new MethodManager().PathForMethod(operation.Name);
                 string script = File.ReadAllText(path);
                 Executor executor = new Executor(4);
-                executor.Add(path, inputsValues.ToArray(), callback);
+                executor.Add(script, inputsValues.ToArray(), callback);
             }
         }
 

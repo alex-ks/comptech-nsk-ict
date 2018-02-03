@@ -15,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\CompTech.Ict.Executor\CompTech.Ict.Executor.csproj" />
     <ProjectReference Include="..\..\src\CompTech.Ict.Sample\CompTech.Ict.Sample.csproj" />
   </ItemGroup>
 
