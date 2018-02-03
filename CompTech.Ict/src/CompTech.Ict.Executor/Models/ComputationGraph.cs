@@ -27,7 +27,6 @@ namespace CompTech.Ict.Executor.Models
         public string[] Output { get; set; }
         [JsonProperty("parameters")]
         public List<DataType> Parameters { get; set; }
-
     }
     public class DataType
     {
@@ -40,7 +39,7 @@ namespace CompTech.Ict.Executor.Models
         [JsonProperty("value")]
         public string Value { get; set; }
         [JsonProperty("type")]
-        public List<DataType> Type { get; set; }
+        public DataType Type { get; set; }
     }
 
     //}

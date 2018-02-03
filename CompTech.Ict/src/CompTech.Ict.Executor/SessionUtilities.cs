@@ -8,16 +8,31 @@ using CompTech.Ict.Executor.Models;
 namespace CompTech.Ict.Executor
 {
     public static class SessionUtilities
-    {
-        
-        public static List<string> GetInputsValues (string[] operationInputs, Dictionary<string, MnemonicsValue> mnemonicsTable)
+    {       
+        public static void UpdateMnemonicValues(Dictionary<string, MnemonicsValue> values, string[] operationOut, string[] newOut)
         {
-            List<string> inputsValues = new List<string>();
-            foreach(string variable in operationInputs)
+            int index = 0;
+            foreach (string each in operationOut)
             {
-                inputsValues.Add(mnemonicsTable[variable].Value);
+                values[each].Value = newOut[index];
+                index++;
             }
-            return inputsValues;
+        }
+
+        public static bool SessionCompleted(List<OperationStatus> operations)
+        {
+            return operations.All(id => id.status == StatusEnum.Completed);
+        }
+
+        public static bool SessionFaild(List<OperationStatus> operations)
+        {
+            return operations.Exists(id => id.status == StatusEnum.Failed);
+        }
+
+        public static void OperationRunning(OperationStatus operation)
+        {
+            operation.status = StatusEnum.Running;
+            operation.result = null;
         }
 
         public static void OperationCompleted(OperationStatus operation, string[] outputs)

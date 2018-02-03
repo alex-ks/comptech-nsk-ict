@@ -45,22 +45,20 @@ namespace CompTech.Ict.Executor
     public class SessionManager
     {
         private Dictionary<Guid, ComputationGraph> sessionDictionary;
-        private Dictionary<Guid, StatusEnum> sessionStatus;
-        private Dictionary<Guid, SessionStatus> operationStatusDictionary;
+        private Dictionary<Guid, SessionStatus> sessionStatus;
         private object lockListSession = new object();
-        private Executor executor;
 
         private Action<string[]> GetCallBack (Guid idSession, int idOperation)
         {
             return (string[] outputs) => Notify(idSession, idOperation, outputs);
         }
+
         public SessionManager()
         {
             sessionDictionary = new Dictionary<Guid, ComputationGraph>();
-            sessionStatus = new Dictionary<Guid, StatusEnum>();
-            operationStatusDictionary = new Dictionary<Guid, SessionStatus>();
-            executor = new Executor();
+            sessionStatus = new Dictionary<Guid, SessionStatus>();
         }
+
         public Guid StartSession(ComputationGraph session)
         {
             Guid idSession = Guid.NewGuid();
@@ -68,46 +66,39 @@ namespace CompTech.Ict.Executor
             {
                 sessionDictionary.Add(idSession, session);
             }
-            lock(lockListSession)
-            {
-                sessionStatus.Add(idSession, StatusEnum.Awaits);
-            }
             List<OperationStatus> opStatus = new List<OperationStatus>();
-            foreach(Operation operation in session.Operations)
+            foreach (Operation operation in session.Operations)
             {
                 opStatus.Add(new OperationStatus(operation.Id, StatusEnum.Awaits));
             }
             lock (lockListSession)
             {
-                operationStatusDictionary.Add(idSession, new SessionStatus(opStatus, session.MnemonicsValues));
+                sessionStatus.Add(idSession, new SessionStatus(opStatus, session.MnemonicsValues));
             }
-            List<int> idAvailableOperation = SessionUtilities.GetIDAvailableOperation(operationStatusDictionary[idSession].operationStatus, sessionDictionary[idSession].Dependecies);
+            List<int> idAvailableOperation = SessionUtilities.GetIDAvailableOperation(sessionStatus[idSession].operationStatus, sessionDictionary[idSession].Dependecies);
             OperationsToExecute(idSession, idAvailableOperation);
             return idSession;
         }
 
         public void Notify(Guid idSession, int idOperation, string[] outputs)
         {
-            OperationStatus operationSt = operationStatusDictionary[idSession].operationStatus[idOperation];
-            if (outputs.Length > 0)
+            OperationStatus operationSt = sessionStatus[idSession].operationStatus[idOperation];
+            if (outputs != null)
             {
                 SessionUtilities.OperationCompleted(operationSt, outputs);
-
                 ComputationGraph session = sessionDictionary[idSession];
-                string[] operationOutputs = session.Operations[idOperation].Output;
+                SessionUtilities.UpdateMnemonicValues(session.MnemonicsValues,
+                                                        session.Operations[idOperation].Output,
+                                                        outputs);
+                SessionUtilities.UpdateMnemonicValues(sessionStatus[idSession].mnemonicsTable,
+                                                        session.Operations[idOperation].Output,
+                                                        outputs);
 
-                int index = 0;
-                foreach(string each in operationOutputs)
+                if (!SessionUtilities.SessionCompleted(sessionStatus[idSession].operationStatus))
                 {
-                    session.MnemonicsValues[each].Value = outputs[index];
-                    index++;
-                }
-                operationStatusDictionary[idSession].mnemonicsTable = session.MnemonicsValues;
-                int countComplitedOperation = operationStatusDictionary[idSession].operationStatus.Count(x => x.status == StatusEnum.Completed);
-                if (countComplitedOperation < operationStatusDictionary[idSession].operationStatus.Count)
-                {
-                    sessionStatus[idSession] = StatusEnum.Running;
-                    List<int> idAvailableOperation = SessionUtilities.GetIDAvailableOperation(operationStatusDictionary[idSession].operationStatus, sessionDictionary[idSession].Dependecies);
+                    List<int> idAvailableOperation = SessionUtilities.GetIDAvailableOperation(
+                                                                    sessionStatus[idSession].operationStatus,
+                                                                    sessionDictionary[idSession].Dependecies);
                     OperationsToExecute(idSession, idAvailableOperation);
                 }
                 else
@@ -130,13 +121,24 @@ namespace CompTech.Ict.Executor
 
             foreach (Operation operation in GetAvailable(operationSession, idAvailableOperation))
             {
-                List<string> inputsValues = SessionUtilities.GetInputsValues(operation.Input,mnemonicsTableSession);                
-                operationStatusDictionary[idSession].operationStatus[operation.Id].status = StatusEnum.Running;
+                List<string> inputsValues = GetInputsValues(operation.Input,mnemonicsTableSession);
+                SessionUtilities.OperationRunning(sessionStatus[idSession].operationStatus[operation.Id]);
                 Action<string[]> callback = GetCallBack(idSession, operation.Id);
                 string path = new MethodManager().PathForMethod(operation.Name);
                 string script = File.ReadAllText(path);
+                Executor executor = new Executor(4);
                 executor.Add(path, inputsValues.ToArray(), callback);
             }
+        }
+
+        public static List<string> GetInputsValues(string[] operationInputs, Dictionary<string, MnemonicsValue> mnemonicsTable)
+        {
+            List<string> inputsValues = new List<string>();
+            foreach (string variable in operationInputs)
+            {
+                inputsValues.Add(mnemonicsTable[variable].Value);
+            }
+            return inputsValues;
         }
 
         public List<Operation> GetAvailable(List<Operation> allOperation, List<int> IdAvailable)
@@ -151,31 +153,43 @@ namespace CompTech.Ict.Executor
 
         public void StopSession(Guid id)
         {
-            if(operationStatusDictionary[id].operationStatus.Count(x => x.status == StatusEnum.Failed) > 0)
+            ComputationGraph session = sessionDictionary[id];
+            SessionStatus status = sessionStatus[id];
+
+            if (SessionUtilities.SessionCompleted(status.operationStatus))
             {
-                sessionStatus[id] = StatusEnum.Failed;
+                //сессия закончена - всё ОК
             }
-            else if(operationStatusDictionary[id].operationStatus.Count(x => x.status == StatusEnum.Completed) == 
-                        operationStatusDictionary[id].operationStatus.Count)
+            else
+                if (SessionUtilities.SessionFaild(status.operationStatus))
             {
-                sessionStatus[id] = StatusEnum.Completed;
+                status.operationStatus.Where(op => op.status == StatusEnum.Awaits).
+                                        Select(op => op.status = StatusEnum.Aborted);
+                //одна операция сломалась значит другие отменяем
+                //в целом сессия Faild
             }
             else
             {
-                sessionStatus[id] = StatusEnum.Aborted;
+                status.operationStatus.Where(op => op.status == StatusEnum.Awaits).
+                                        Select(op => op.status = StatusEnum.Aborted);
+                //сессия была отменена пользователем
+                //в целом сессия Aborted
             }
-            ComputationGraph session;
             lock (lockListSession)
             {
-                sessionDictionary.Remove(id, out session);
-            }                                    
+                sessionDictionary.Remove(id);
+            }
+            lock (lockListSession)
+            {
+                sessionStatus.Remove(id);
+            }
         }
 
         public SessionStatus GetStatusSession(Guid idSession)
         {
-            if (operationStatusDictionary.ContainsKey(idSession))
+            if (sessionStatus.ContainsKey(idSession))
             {
-                return operationStatusDictionary[idSession];
+                return sessionStatus[idSession];
             }
             else
             {
