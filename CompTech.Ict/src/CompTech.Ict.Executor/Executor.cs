@@ -7,7 +7,7 @@ using System.IO;
 using System.Diagnostics;
 using System.Threading.Tasks.Dataflow;
 
-namespace example
+namespace CompTech.Ict.Executor
 {
     public enum ExecutorStatus
     {

@@ -2,11 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using CompTech.Ict.Sample.Data;
-using CompTech.Ict.Sample.Models;
+using CompTech.Ict.Executor.Models;
 using Microsoft.AspNetCore.Mvc;
 
-namespace CompTech.Ict.Sample.Controllers
+namespace CompTech.Ict.Executor.Controllers
 {
     [Route("api/[controller]")]
     public class SessionController : Controller
@@ -21,17 +20,17 @@ namespace CompTech.Ict.Sample.Controllers
         
         // GET api/values/5
         [HttpGet("{id}")]
-        public IActionResult Get(int id)
+        public IActionResult Get(Guid id)
         {            
-            var session = _manager.Get(id);
+            var session = _manager.GetStatusSession(id);
             return Ok(session);
         }
 
         // POST api/values
         [HttpPost]
-        public IActionResult Post([FromBody]Comp_Graph graph)
+        public IActionResult Post([FromBody]ComputationGraph graph)
         {
-            var s = _manager.Create(graph);
+            var s = _manager.StartSession(graph);
             //validation 
 
             return Ok(graph);
@@ -39,9 +38,9 @@ namespace CompTech.Ict.Sample.Controllers
 
         // DELETE api/values/5
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public IActionResult Delete(Guid id)
         {
-            _manager.Delete(id);
+            _manager.StopSession(id);
             return Ok();			
         }
     }

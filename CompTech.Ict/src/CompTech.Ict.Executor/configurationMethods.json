@@ -1,0 +1,9 @@
+﻿{
+  "numberFile": "Methods/NumberFromFile.txt",
+  "+": "Methods/Addition.txt",
+  "-": "Methods/Subtraction.txt",
+  "*": "Methods/Multiplication.txt",
+  "/": "Methods/Division.txt",
+  "**": "Methods/Pow.txt",
+  "id": "Methods/Idempotency.txt"
+}
