@@ -2,12 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CompTech.Ict.Executor.Data;
+using CompTech.Ict.Executor;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
+using Microsoft.AspNetCore.Mvc;
+using CompTech.Ict.Executor.Models;
 
 namespace CompTech.Ict.Executor
 {
@@ -23,6 +28,8 @@ namespace CompTech.Ict.Executor
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton<SessionManager>();
+            services.AddTransient<ApplicationContext>();
             services.AddMvc();
         }
 

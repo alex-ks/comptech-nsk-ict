@@ -44,7 +44,7 @@ namespace CompTech.Ict.Executor
 
     public class SessionManager
     {
-        private Dictionary<Guid, ComputationGraph> sessionDictionary;
+        private Dictionary<Guid, Comp_Graph> sessionDictionary;
         private Dictionary<Guid, SessionStatus> sessionStatus;
         private object lockListSession = new object();
 
@@ -55,11 +55,11 @@ namespace CompTech.Ict.Executor
 
         public SessionManager()
         {
-            sessionDictionary = new Dictionary<Guid, ComputationGraph>();
+            sessionDictionary = new Dictionary<Guid, Comp_Graph>();
             sessionStatus = new Dictionary<Guid, SessionStatus>();
         }
 
-        public Guid StartSession(ComputationGraph session)
+        public Guid StartSession(Comp_Graph session)
         {
             Guid idSession = Guid.NewGuid();
             lock (lockListSession)
@@ -86,7 +86,7 @@ namespace CompTech.Ict.Executor
             if (outputs != null)
             {
                 SessionUtilities.OperationCompleted(operationSt, outputs);
-                ComputationGraph session = sessionDictionary[idSession];
+                Comp_Graph session = sessionDictionary[idSession];
                 SessionUtilities.UpdateMnemonicValues(session.MnemonicsValues,
                                                         session.Operations[idOperation].Output,
                                                         outputs);
@@ -115,7 +115,7 @@ namespace CompTech.Ict.Executor
 
         public void OperationsToExecute(Guid idSession, List<int> idAvailableOperation)
         {
-            ComputationGraph session = sessionDictionary[idSession];
+            Comp_Graph session = sessionDictionary[idSession];
             List<Operation> operationSession = session.Operations;
             Dictionary<string, MnemonicsValue> mnemonicsTableSession = session.MnemonicsValues;
 
@@ -153,7 +153,7 @@ namespace CompTech.Ict.Executor
 
         public void StopSession(Guid id)
         {
-            ComputationGraph session = sessionDictionary[id];
+            Comp_Graph session = sessionDictionary[id];
             SessionStatus status = sessionStatus[id];
 
             if (SessionUtilities.SessionCompleted(status.operationStatus))
