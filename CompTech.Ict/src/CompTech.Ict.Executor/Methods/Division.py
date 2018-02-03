@@ -10,24 +10,24 @@ def isInt(s):
         return True
     except ValueError:
         return False
-# на вход -- папка со входами
+
 if __name__ == "__main__":
     
     
-    argFiles  = [] # файлы
-    nameFiles = [] # строки файлов
-    values = [] # числовые значения
+    argFiles  = []
+    nameFiles = []
+    values = [] 
     result = 0
     
-    nameFiles = os.listdir(sys.argv[1]) #список файлов
-    nameFiles.remove("source.py") #удаление из списка
+    nameFiles = os.listdir(sys.argv[1]) 
+    nameFiles.remove("source.py") 
     for i in range(len(nameFiles)):
         with open(os.path.join(sys.argv[1],nameFiles[i]), 'r') as f:
             arg = f.readline()
-        argFiles.append((arg)) #строки входов
+        argFiles.append((arg)) 
     flagIntegers = True        
     if (len(argFiles) == 2):
-        # разбиение строк
+        
         for i in range(len(argFiles)):
 
             if isInt(argFiles[i]):
@@ -36,7 +36,7 @@ if __name__ == "__main__":
                 values.append(float(argFiles[i]))
                 flagIntegers = False
                 
-        #Операция /
+        
         if flagIntegers:
             result = (int)(values[0] / values[1])
         else:
