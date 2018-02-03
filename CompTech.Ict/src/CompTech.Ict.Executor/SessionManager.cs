@@ -163,26 +163,22 @@ namespace CompTech.Ict.Executor
             else
                 if (SessionUtilities.SessionFaild(status.operationStatus))
             {
-                status.operationStatus.Where(op => op.status == StatusEnum.Awaits).
-                                        Select(op => op.status = StatusEnum.Aborted);
+                foreach(OperationStatus operation in status.operationStatus.Where(op => op.status == StatusEnum.Awaits))
+                {
+                    operation.status = StatusEnum.Aborted;
+                }                
                 //одна операция сломалась значит другие отменяем
                 //в целом сессия Faild
             }
             else
             {
-                status.operationStatus.Where(op => op.status == StatusEnum.Awaits).
-                                        Select(op => op.status = StatusEnum.Aborted);
+                foreach (OperationStatus operation in status.operationStatus.Where(op => op.status == StatusEnum.Awaits))
+                {
+                    operation.status = StatusEnum.Aborted;
+                }
                 //сессия была отменена пользователем
                 //в целом сессия Aborted
-            }
-            lock (lockListSession)
-            {
-                sessionDictionary.Remove(id);
-            }
-            lock (lockListSession)
-            {
-                sessionStatus.Remove(id);
-            }
+            }            
         }
 
         public SessionStatus GetStatusSession(Guid idSession)

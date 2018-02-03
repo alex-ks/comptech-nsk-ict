@@ -1,3 +1,9 @@
 ﻿{
-  "numberFile": "C:\\comptech-nsk-ict\\CompTech.Ict\\src\\CompTech.Ict.Executor\\Methods\\NumberFromFile.py"
+  "numberFile": "C:\\comptech-nsk-ict\\CompTech.Ict\\src\\CompTech.Ict.Executor\\Methods\\NumberFromFile.py",
+  "+": "C:\\comptech-nsk-ict\\CompTech.Ict\\src\\CompTech.Ict.Executor\\Methods\\Addition.py",
+  "-": "C:\\comptech-nsk-ict\\CompTech.Ict\\src\\CompTech.Ict.Executor\\Methods\\Subtraction.py",
+  "*": "C:\\comptech-nsk-ict\\CompTech.Ict\\src\\CompTech.Ict.Executor\\Methods\\Multiplication.py",
+  "/": "C:\\comptech-nsk-ict\\CompTech.Ict\\src\\CompTech.Ict.Executor\\Methods\\Division.py",
+  "**": "C:\\comptech-nsk-ict\\CompTech.Ict\\src\\CompTech.Ict.Executor\\Methods\\Pow.py",
+  "id": "C:\\comptech-nsk-ict\\CompTech.Ict\\src\\CompTech.Ict.Executor\\Methods\\Idempotency.py"
 }
