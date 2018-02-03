@@ -45,9 +45,15 @@ namespace CompTech.Ict.Executor
         private string[] FilesToOutputs(string path)
         {
             string[] files = Directory.GetFiles(path, "*output.txt");
-            string[] result = new string[files.Length];
-            for (int i = 0; i < files.Length; i++)
-                result[i] = File.ReadAllText(files[i]);
+            string[] result;
+            if (files != null)
+            {
+                result = new string[files.Length];
+                for (int i = 0; i < files.Length; i++)
+                    result[i] = File.ReadAllText(files[i]);
+            }
+            else
+                return null;
             return result;
         }
         public Executor(int n)
@@ -66,6 +72,10 @@ namespace CompTech.Ict.Executor
                 CallBack = callBack
             });
         }
+        public void EndOfData()
+        {
+            queue.Complete();
+        }
 
         private async void Loop()
         {
@@ -83,10 +93,17 @@ namespace CompTech.Ict.Executor
                     {
                         string id = Guid.NewGuid().ToString();
                         var path = ArgumentsToFiles(tmp.Parameters, tmp.ScriptSource, id);
-                        OperationRun(path, tmp.CallBack);
-                        string[] result = FilesToOutputs(path);
-                        Console.WriteLine(result[0]);
-                        tmp.CallBack(result);
+                        try
+                        {
+                            OperationRun(path, tmp.CallBack);
+                            string[] result = FilesToOutputs(path);
+                            tmp.CallBack(result);
+                        }
+                        catch(Exception ex)
+                        {
+                            Console.Error.WriteLine(ex.Message);
+                            tmp.CallBack(null);
+                        }
                         Directory.Delete(path, true);
                     }
                     semaphore.Release();
@@ -108,21 +125,11 @@ namespace CompTech.Ict.Executor
             };
 
             Process process = new Process();
-            try
-            {
-                process = Process.Start(start);
-                process.WaitForExit();
-                if (process.ExitCode != 0)
-                {
-                    Console.Error.WriteLine("Ошибка в исполнении скрипта: {0}", process.ExitCode);
-                    callBack(null);
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine(ex.Message);
-                callBack(null);
-            }
+            process = Process.Start(start);
+            process.WaitForExit();
+            if (process.ExitCode != 0)
+                throw new Exception($"Ошибка в исполнении скрипта: {process.ExitCode}");
+          
         }
     }
 }
