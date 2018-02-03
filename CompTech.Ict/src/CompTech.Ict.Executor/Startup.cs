@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using CompTech.Ict.Executor.Data;
 using CompTech.Ict.Executor;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -29,7 +28,6 @@ namespace CompTech.Ict.Executor
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton<SessionManager>();
-            services.AddTransient<ApplicationContext>();
             services.AddMvc();
         }
 

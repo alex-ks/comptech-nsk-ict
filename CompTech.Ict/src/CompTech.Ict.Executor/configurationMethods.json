@@ -1,9 +1,9 @@
 ﻿{
-  "numberFile": "Methods/NumberFromFile.py",
-  "+": "Methods/Addition.py",
-  "-": "Methods/Subtraction.py",
-  "*": "Methods/Multiplication.py",
-  "/": "Methods/Division.py",
-  "**": "Methods/Pow.py",
-  "id": "Methods/Idempotency.py"
+  "numberFile": "Methods/NumberFromFile.txt",
+  "+": "Methods/Addition.txt",
+  "-": "Methods/Subtraction.txt",
+  "*": "Methods/Multiplication.txt",
+  "/": "Methods/Division.txt",
+  "**": "Methods/Pow.txt",
+  "id": "Methods/Idempotency.txt"
 }
