@@ -14,8 +14,8 @@ namespace CompTech.Ict.Executor
             int index = 0;
             foreach (string each in operationOut)
             {
-
                 values.Add(each, new MnemonicsValue { Value = newOut[index], Type = null});
+                Console.WriteLine($"UPDATE VALUES: add var: {each} val: {newOut[index]}");
                 index++;
             }
         }
@@ -54,7 +54,7 @@ namespace CompTech.Ict.Executor
             int countOperation = dependencies.Length;
             for(int i = 0; i < countOperation; i++)
             {
-                if(operation[i].status != StatusEnum.Completed)
+                if(operation[i].status == StatusEnum.Awaits)
                 {
                     if (dependencies[i].All(id => operation[id].status == StatusEnum.Completed))
                     {
