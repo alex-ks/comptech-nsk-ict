@@ -2,7 +2,7 @@
   "numberFile": "Methods/NumberFromFile.py",
   "Hrv.List.average": "Methods/Mean.py",
   "Hrv.List.std": "Methods/Std.py",
-  "Hrv.List.normalTest": "Methods/NumberFromFile.py",
+  "Hrv.List.normalTest": "Methods/Normal.py",
   "Hrv.loadData": "Methods/LoadData.py",
   "Hrv.date": "Methods/Idempotency.py",
   "+": "Methods/Addition.py",
