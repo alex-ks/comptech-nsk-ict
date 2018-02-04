@@ -13,11 +13,6 @@ function PostSession(compiledSession){
     return requester.responseText.slice(1, -1);
 }
 
-function TmpPostSession(compiledSession){
-    var id = 1;
-    return id;
-}
-
 function GetId() {
     var url = new URL(window.location.href);
     return url.searchParams.get('id');
@@ -40,6 +35,7 @@ function updateValuesTable(table) {
         const v = table[k].value;
 
         var iDiv = document.createElement('div');
+        iDiv.style = 'white-space: nowrap; overflow: hidden; text-overflow: ellipsis;';
         iDiv.textContent = `${k} = ${v}`;
         tableNode.appendChild(iDiv);
     });
