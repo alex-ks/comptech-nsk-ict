@@ -31,12 +31,14 @@ if __name__ == "__main__":
     post_fields = {'Authorization': 'Bearer ' + str(access_token)}
     request = requests.get(url, headers={'Authorization': 'Bearer ' + str(access_token)})
     ParseGetJson = json.loads(request.content)
-    
+
+    countRecords = len(ParseGetJson)
     with open(os.path.join(sys.argv[1],str(1)+"output.txt"), 'w') as f:  
-        for i in range(len(ParseGetJson)):
-            for j in range(len(ParseGetJson[i]['points']) - 1):
+        for i in range(countRecords):
+            countValue = len(ParseGetJson[i]['points'])
+            for j in range(countValue - 1):
                 f.write(str(ParseGetJson[i]['points'][j]['y'])+ " ")
-            f.write(str(ParseGetJson[i]['points'][j+1]['y']))
+        f.write(str(ParseGetJson[countRecords-1]['points'][countValue - 1]['y']))
     print(1)                
 
 
