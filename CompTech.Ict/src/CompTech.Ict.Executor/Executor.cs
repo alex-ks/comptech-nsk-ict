@@ -95,7 +95,7 @@ namespace CompTech.Ict.Executor
                         var path = ArgumentsToFiles(tmp.Parameters, tmp.ScriptSource, id);
                         try
                         {
-                            OperationRun(path, tmp.CallBack);
+                            OperationRun(path);
                             string[] result = FilesToOutputs(path);
                             tmp.CallBack(result);
                         }
@@ -114,7 +114,7 @@ namespace CompTech.Ict.Executor
             }
         }
 
-        private void OperationRun(string inputPath, Action<string[]> callBack)
+        private void OperationRun(string inputPath)
         {
             ProcessStartInfo start = new ProcessStartInfo()
             {
